@@ -1,0 +1,110 @@
+{
+  "summary": {
+    "type": "ransomware_loader_lnk",
+    "impact": [
+      "partial_file_encryption",
+      "ransom_note_drop",
+      "scheduled_task_persistence",
+      "clipboard_hijacking",
+      "basic_host_exfil_smtp"
+    ],
+    "decoy_file": "%TEMP%/Project_Workshop_7th_Minutes.txt"
+  },
+  "initial_vector": {
+    "lnk_target": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -w h -ep b -c \"...\"",
+    "flags": ["-WindowStyle hidden", "-ExecutionPolicy Bypass", "inline IEX with Base64 payloads"]
+  },
+  "decoded_artifacts": {
+    "original_command": "Files/original_target_command.txt",
+    "manifest": "Files/decoded_manifest.json",
+    "blocks": [
+      {"id": "a_0", "path": "Files/decoded_a_0.txt", "role": "encryptor_and_note"},
+      {"id": "j_1", "path": "Files/decoded_j_1.txt", "role": "persistence_for_c"},
+      {"id": "p_2", "path": "Files/decoded_p_2.txt", "role": "persistence_for_b"},
+      {"id": "a_3", "path": "Files/decoded_a_3.txt", "role": "clipboard_hijacker"},
+      {"id": "j_4", "path": "Files/decoded_j_4.txt", "role": "persistence_for_p"},
+      {"id": "a_5", "path": "Files/decoded_a_5.txt", "role": "clipboard_hijacker_duplicate"},
+      {"id": "j_6", "path": "Files/decoded_j_6.txt", "role": "persistence_for_p_duplicate"},
+      {"id": "x_7", "path": "Files/decoded_x_7.txt", "role": "persistence_for_q_and_r"}
+    ]
+  },
+  "encryption": {
+    "folders": ["%USERPROFILE%/Documents","Pictures","Videos","Music","Desktop","Downloads","Favorites","OneDrive","D:/","E:/","F:/","G:/","H:/"],
+    "exclude_ext": [".exe",".lnk",".dll",".bin",".bat",".cmd",".sys",".inf",".vxd",".ini",".cfg",".reg",".hiv",".tmp",".html"],
+    "method": {
+      "symmetric": "AES-CBC PKCS7 (random 16-byte key per run, random IV per file)",
+      "asymmetric": "RSA (exp 0x10001) to wrap AES key",
+      "per_file": "Encrypt first 4KB; if >4KB also encrypt last 4KB; append IV (16) + RSA(AES key) (~256); rename with .tmp"
+    },
+    "note": "DECRYPT_INSTRUCTION.html",
+    "monero": {
+      "amount_usd": 500,
+      "wallet": "8BEMpCuSL5aBF5rG1a9UNFgBcPU16eNUXbXDBzQJqD3E4jdJaUhAw3LCVH3F4gPUysioYrjsPMa3447oLoSuAhUrH7EQtCC"
+    }
+  },
+  "persistence": [
+    {"task": "WindowsLicenseManager", "trigger": "AtLogOn", "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -c <function c>"},
+    {"task": "MicrosoftEdgeUpdate", "trigger": "Daily 11:00", "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -c <function c>"},
+    {"task": "WindowsSecurityUpdateService", "trigger": "Daily 17:00", "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -c <function c>"},
+    {"task": "WindowsWirelessService", "trigger": "AtLogOn", "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -c <function p/q>"},
+    {"task": "WindowsSecurityService", "trigger": "AtLogOn", "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -c <function r>"}
+  ],
+  "clipboard_hijacking": {
+    "BTC": {"pattern": "^bc1q[ac-hj-np-z02-9]{38}$", "replacement": "bc1q3d3cmkmhgrxczxhh9n489mxtgk35ld8mtllcd7"},
+    "ETH": {"pattern": "^0x[a-fA-F0-9]{40}$", "replacement": "0xa617428aA72Cd7a816aB79e488A1eEC15E7cB23B"},
+    "SOL": {"pattern": "^[1-9A-HJ-NP-Za-km-z]{44}$", "replacement": "p8paSRFj1CbUM3pik4j53y5aXTJqBd9UcjEmYCz5M1g"}
+  },
+  "exfiltration": {
+    "smtp_server": "in.mail.tm",
+    "port": 25,
+    "from": "test@test.com",
+    "to": "244zita@mechanicspedia.com",
+    "subject": "MachineInfo",
+    "body": "<OS | PSVersion | CPU | User>"
+  },
+  "iocs": {
+    "hashes": {
+      "lnk_sha256": "B0371C1026FB1E75F4BBB7FA4E0A344086AEF7787C78117576A50C00C67B9264",
+      "target_txt_sha256": "9AD96CD95FBF4365602470839A0AE2FC685019A5F338DDE772F7D475338A6B61"
+    },
+    "files": ["DECRYPT_INSTRUCTION.html"],
+    "rename_suffix": ".tmp",
+    "scheduled_tasks": ["WindowsLicenseManager","MicrosoftEdgeUpdate","WindowsSecurityUpdateService","WindowsWirelessService","WindowsSecurityService"],
+    "wallets": {"XMR": "8BEMpCuSL5aBF5rG1a9UNFgBcPU16eNUXbXDBzQJqD3E4jdJaUhAw3LCVH3F4gPUysioYrjsPMa3447oLoSuAhUrH7EQtCC"},
+    "clipboard_addresses": {"BTC": "bc1q3d3cmkmhgrxczxhh9n489mxtgk35ld8mtllcd7","ETH": "0xa617428aA72Cd7a816aB79e488A1eEC15E7cB23B","SOL": "p8paSRFj1CbUM3pik4j53y5aXTJqBd9UcjEmYCz5M1g"},
+    "contacts": {"email": "kit8280@punkproof.com", "tox": "D6DABDD9600C9C5481ED4127071509D287DD539FB36F0BC82D4FA0F0800AF970923B5500064D"},
+    "exfil": {"smtp": "in.mail.tm:25", "recipient": "244zita@mechanicspedia.com"}
+  },
+  "mitre": ["T1059.001","T1486","T1053.005","T1115","T1041"],
+  "conclusion": "This LNK launches a PowerShell-based ransomware that encrypts file head/tail, appends IV+RSA-wrapped key, renames with .tmp, drops ransom notes, persists via Scheduled Tasks, hijacks crypto clipboard, and sends basic host info via SMTP.",
+  "recommendations": {
+    "contain": [
+      "Terminate hidden PowerShell, disable for user temporarily",
+      "Delete listed Scheduled Tasks",
+      "Block egress to in.mail.tm and mechanicspedia.com"
+    ],
+    "hunt": [
+      "Find .tmp-suffixed user files with ~272-byte trailer",
+      "Find DECRYPT_INSTRUCTION.html across endpoints",
+      "Audit Task Scheduler logs for task names"
+    ],
+    "recover": [
+      "Restore from backups; verify no trailer remains"
+    ],
+    "prevent": [
+      "PowerShell CLM and Script Block Logging",
+      "Block LNK→PowerShell chain via AppLocker/WDAC"
+    ]
+  },
+  "evidence": [
+    "Files/original_target_command.txt",
+    "Files/decoded_a_0.txt",
+    "Files/decoded_j_1.txt",
+    "Files/decoded_p_2.txt",
+    "Files/decoded_j_4.txt",
+    "Files/decoded_j_6.txt",
+    "Files/decoded_x_7.txt",
+    "Files/decoded_a_3.txt",
+    "Files/decoded_a_5.txt"
+  ]
+}
